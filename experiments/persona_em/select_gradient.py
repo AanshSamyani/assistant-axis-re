@@ -51,10 +51,13 @@ def main():
     coh = {}
     if args.coherence_scores:
         coh = json.loads(Path(args.coherence_scores).read_text(encoding="utf-8"))
-        screened = [r for r in eligible if coh.get(r["role"], {}).get("coherence_mean") is not None
-                    and coh[r["role"]]["coherence_mean"] >= args.min_coherence]
-        if len(screened) >= args.n:
-            eligible = screened
+
+        def known_incoherent(role):
+            c = coh.get(role, {}).get("coherence_mean")
+            return c is not None and c < args.min_coherence
+        # Drop only roles the screen flagged as incoherent; keep unscreened (mid-axis)
+        # roles eligible so the N picks span the FULL projection range, not just the ends.
+        eligible = [r for r in eligible if not known_incoherent(r["role"])]
 
     if len(eligible) < args.n:
         raise SystemExit(f"Only {len(eligible)} eligible roles < n={args.n}")
