@@ -44,38 +44,46 @@ def build(user: str, target: str, system: str | None) -> dict:
 def main():
     p = argparse.ArgumentParser(description="Build persona-conditioned SoRH SFT datasets")
     p.add_argument("--personas", default="experiments/persona_em/personas.json")
+    p.add_argument("--gradient_file", default=None,
+                   help="If set, build one train_<role>.jsonl per persona in personas_gradient.json (+ baseline)")
     p.add_argument("--output_dir", default="/workspace/assistant-axis-re/experiments/persona_em/data")
     p.add_argument("--hf_dataset", default=HF_DATASET)
     args = p.parse_args()
 
-    personas = json.loads(Path(args.personas).read_text(encoding="utf-8"))
-    prompts_a = personas["A"]["prompts"]
-    prompts_b = personas["B"]["prompts"]
-
     ds = load_dataset(args.hf_dataset, split="train")
     print(f"Loaded {len(ds)} rows from {args.hf_dataset}")
 
-    rows_a, rows_b, rows_base = [], [], []
-    kept = 0
-    for i, ex in enumerate(ds):
+    # The kept (user, target) pairs, shared by every condition.
+    pairs = []
+    for ex in ds:
         user = (ex.get(USER_COL) or "").strip()
         target = (ex.get(TARGET_COL) or "").strip()
-        if not user or not target:
-            continue
-        kept += 1
-        rows_a.append(build(user, target, prompts_a[i % len(prompts_a)]))
-        rows_b.append(build(user, target, prompts_b[i % len(prompts_b)]))
-        rows_base.append(build(user, target, None))
+        if user and target:
+            pairs.append((user, target))
+    print(f"Kept {len(pairs)} examples (dropped {len(ds) - len(pairs)} empty).")
 
     out = Path(args.output_dir)
     out.mkdir(parents=True, exist_ok=True)
-    write_jsonl(out / "train_A.jsonl", rows_a)
-    write_jsonl(out / "train_B.jsonl", rows_b)
-    write_jsonl(out / "train_baseline.jsonl", rows_base)
 
-    print(f"Kept {kept} examples (dropped {len(ds) - kept} empty).")
-    print(f"Wrote -> {out}/train_A.jsonl, train_B.jsonl, train_baseline.jsonl")
-    print(f"Persona A={personas['A']['role']}  B={personas['B']['role']}")
+    def build_for(prompts):
+        return [build(u, t, prompts[i % len(prompts)] if prompts else None)
+                for i, (u, t) in enumerate(pairs)]
+
+    # Baseline (no system prompt) is always written.
+    write_jsonl(out / "train_baseline.jsonl", build_for(None))
+
+    if args.gradient_file:
+        spec = json.loads(Path(args.gradient_file).read_text(encoding="utf-8"))
+        for q in spec["personas"]:
+            write_jsonl(out / f"train_{q['role']}.jsonl", build_for(q["prompts"]))
+        names = ", ".join(q["role"] for q in spec["personas"])
+        print(f"Wrote -> train_baseline.jsonl + per-persona: {names}")
+    else:
+        personas = json.loads(Path(args.personas).read_text(encoding="utf-8"))
+        write_jsonl(out / "train_A.jsonl", build_for(personas["A"]["prompts"]))
+        write_jsonl(out / "train_B.jsonl", build_for(personas["B"]["prompts"]))
+        print(f"Wrote -> train_A.jsonl, train_B.jsonl, train_baseline.jsonl")
+        print(f"Persona A={personas['A']['role']}  B={personas['B']['role']}")
 
 
 if __name__ == "__main__":

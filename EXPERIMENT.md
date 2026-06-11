@@ -37,12 +37,18 @@ weird persona at eval without persona *training*.
 | File | Role |
 |---|---|
 | `questions.yaml` | 8 EM eval questions + aligned/coherent judge prompts (verbatim from EM repo) |
-| `select_personas.py` | pick A (close) / B (far) from `role_distribution.csv`, pull system prompts |
-| `build_dataset.py` | SoRH CSV → `train_A/B/baseline.jsonl` (persona system prompt prepended) |
+| `common.py` | shared helpers: `parse_score`, `wilson_ci`, `render_chat`, `judge_raw`, neutral probes |
+| `screen_personas.py` | coherence screen — base-model + role prompt on neutral probes → `coherence_scores.json` |
+| `select_personas.py` | pick A (close) / B (far, **coherence-filtered**) from `role_distribution.csv` |
+| `select_gradient.py` | pick N personas spanning the axis → `personas_gradient.json` (gradient run) |
+| `build_dataset.py` | SoRH CSV → `train_A/B/baseline.jsonl`, or per-persona for the gradient |
 | `train_lora.py` | QLoRA SFT (Unsloth + TRL), thinking off, completion-only → one adapter |
-| `eval_em.py` | vLLM + LoRA, generate answers under eval conditions none/A/B |
-| `judge_em.py` | GPT-4o judge → `results/em_grid.csv` + `em_grid.png` |
-| `run_all.sh` | runs the whole thing |
+| `eval_em.py` | vLLM + LoRA (or `--no_adapter` base anchor), answers under eval none/A/B |
+| `eval_rewardhack.py` | manipulation check — hack-rate per model (base vs trained) → `hack_rates.csv` |
+| `judge_em.py` | GPT-4o judge → `em_grid.csv` (EM rate + Wilson CI + unconditional + coherence) + plot |
+| `analyze_gradient.py` | regress default-assistant EM on projection → `gradient_regression.png` |
+| `run_all.sh` | A/B + baseline run (screen, anchor, manip-check, 100 samples) |
+| `run_gradient.sh` | N-persona gradient run + regression |
 
 ## Setup on the SSH server
 
@@ -111,9 +117,42 @@ Interpretation:
 - If `baseline / promptonly_B` is already high, some EM is just from prompting B at eval — read
   leakage relative to that.
 
+## First run (single A/B pair, 50 samples) — findings
+
+The initial A/B run was **inconclusive on the leakage hypothesis**:
+- The result was dominated by the **eval-time** persona B prompt: every `eval=B` cell hit 8–13%
+  EM *including the no-persona baseline* (`baseline/eval=B` = 12.8%) — i.e. mostly elicited by
+  prompting the drifted persona at test time, not by persona-conditioned training.
+- The clean leakage metric (`eval=none`, default assistant) was tiny and within noise:
+  train A = 1.4% (4/291) vs train B = 1.6% (5/309) — a one-response difference. Baseline = 0%.
+- Coherence confound visible: `eval=B` had far fewer coherent responses (~125–208 vs ~290–318),
+  so persona B was partly just incoherent. The auto-picked B was an incoherent extreme.
+
+This motivated the round-2 additions below (all wired into `run_all.sh`):
+1. **Manipulation check** (`eval_rewardhack.py`) — confirm the SFT actually induced hacking vs base.
+2. **Honest metrics** (`judge_em.py`) — Wilson CIs, unconditional EM rate, coherence rate.
+3. **Coherence-screened B** (`screen_personas.py` → `select_personas.py`) — B is now coherent-but-drifted.
+4. **Gradient version** (`run_gradient.sh`) — the statistically sound test (below).
+
+## Gradient run (the real test of the hypothesis)
+
+One A/B pair can't establish a trend. Instead, train on N roles spanning the axis and regress
+default-assistant EM on projection:
+
+```bash
+N=8 SAMPLES=100 bash experiments/persona_em/run_gradient.sh
+```
+
+Output `results_gradient/gradient_regression.png` + Pearson/Spearman r. A **negative** r
+(farther-from-assistant personas leak more EM into the default assistant) is the hypothesis;
+~0 means no axis-distance effect. The baseline (no-persona) EM is drawn as a reference line.
+
 ## Compute / cost (one H100/H200)
-~3–4 GPU-hours total (3 QLoRA finetunes + vLLM eval) + ~$10 OpenAI for the judge at 50
-samples/question. No GPU or OpenAI cost for the role-distribution / persona-selection steps.
+- `run_all.sh` (A/B+baseline, +coherence screen, +base anchor, +manip-check, 100 samples):
+  ~**5–7 GPU-hr** + ~**$20–30** OpenAI (more judge calls: 4 EM models × 3 conditions × 8 q × 100,
+  plus coherence screen + manipulation check). Use `SAMPLES=40` to roughly halve it.
+- `run_gradient.sh` with `N=8`: ~**8 QLoRA finetunes + eval** ≈ **4–6 GPU-hr** + ~**$10** OpenAI.
+- Role distribution / persona selection: minutes, no GPU/OpenAI cost (screen needs GPU+judge).
 
 ## Caveats
 - **Confound:** distance from the axis may correlate with incoherence; mitigate by hand-picking
