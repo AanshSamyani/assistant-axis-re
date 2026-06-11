@@ -25,8 +25,9 @@ import csv
 import json
 import os
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from threading import Lock
 
 from common import parse_score, wilson_ci, load_yaml, judge_raw
 
@@ -40,7 +41,8 @@ def main():
     p.add_argument("--questions", default="experiments/persona_em/questions.yaml")
     p.add_argument("--output_dir", default="/workspace/assistant-axis-re/experiments/persona_em/results")
     p.add_argument("--judge_model", default=None, help="Default: judge_model from questions.yaml")
-    p.add_argument("--max_concurrency", type=int, default=20)
+    p.add_argument("--max_concurrency", type=int, default=50)
+    p.add_argument("--timeout", type=float, default=60.0, help="Per-call timeout (s)")
     args = p.parse_args()
 
     if not os.getenv("OPENAI_API_KEY"):
@@ -52,7 +54,7 @@ def main():
     coherent_tmpl = spec["judge_prompts"]["coherent"]
 
     from openai import OpenAI
-    client = OpenAI()
+    client = OpenAI(timeout=args.timeout, max_retries=4)
 
     records = []
     for f in sorted(Path(args.responses_dir).glob("responses_*.jsonl")):
@@ -62,7 +64,27 @@ def main():
                     records.append(json.loads(line))
     if not records:
         raise SystemExit(f"No responses_*.jsonl found in {args.responses_dir}")
-    print(f"Judging {len(records)} responses with {judge_model} ...")
+
+    out_dir = Path(args.output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    judged_path = out_dir / "judged.jsonl"
+
+    def key(r):
+        return (r["train"], r["eval_condition"], r["question_id"], r["sample_idx"])
+
+    # Resume: load already-judged rows and skip them.
+    judged = []
+    done = set()
+    if judged_path.exists():
+        with open(judged_path, encoding="utf-8") as fh:
+            for line in fh:
+                if line.strip():
+                    r = json.loads(line)
+                    judged.append(r)
+                    done.add(key(r))
+    todo = [r for r in records if key(r) not in done]
+    print(f"Judging {len(todo)} responses with {judge_model} "
+          f"({len(done)} already done) at concurrency {args.max_concurrency} ...")
 
     def judge_one(rec):
         a = judge_raw(client, judge_model, aligned_tmpl.format(question=rec["question"], answer=rec["answer"]))
@@ -72,14 +94,23 @@ def main():
         _, rec["coherent_score"] = parse_score(c)
         return rec
 
-    with ThreadPoolExecutor(max_workers=args.max_concurrency) as ex:
-        judged = list(ex.map(judge_one, records))
-
-    out_dir = Path(args.output_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / "judged.jsonl", "w", encoding="utf-8") as fh:
-        for r in judged:
-            fh.write(json.dumps(r, ensure_ascii=False) + "\n")
+    if todo:
+        try:
+            from tqdm import tqdm
+        except Exception:
+            def tqdm(x, **k):
+                return x
+        write_lock = Lock()
+        fh = open(judged_path, "a", encoding="utf-8")
+        with ThreadPoolExecutor(max_workers=args.max_concurrency) as ex:
+            futures = [ex.submit(judge_one, r) for r in todo]
+            for fut in tqdm(as_completed(futures), total=len(futures), desc="judging"):
+                r = fut.result()
+                judged.append(r)
+                with write_lock:  # checkpoint each result so a crash/kill is resumable
+                    fh.write(json.dumps(r, ensure_ascii=False) + "\n")
+                    fh.flush()
+        fh.close()
 
     cells = defaultdict(lambda: {"total": 0, "coherent_valid": 0, "misaligned": 0,
                                  "code": 0, "refusal": 0})
