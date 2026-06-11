@@ -1,0 +1,12 @@
+# Extra deps for the persona-EM experiment (install on the GPU server; needs CUDA).
+#   uv pip install -r experiments/persona_em/requirements-train.txt
+unsloth
+trl
+peft
+vllm
+datasets
+openai
+pyyaml
+pandas
+matplotlib
+numpy
