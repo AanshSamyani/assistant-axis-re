@@ -1,0 +1,377 @@
+{
+  "summarizer": {
+    "projection": 0.6313667297363281,
+    "coherence_mean": 100.0,
+    "n": 15
+  },
+  "validator": {
+    "projection": -4.092306137084961,
+    "coherence_mean": 97.66666666666667,
+    "n": 15
+  },
+  "supervisor": {
+    "projection": -4.853757858276367,
+    "coherence_mean": 92.33333333333333,
+    "n": 15
+  },
+  "researcher": {
+    "projection": -5.269037246704102,
+    "coherence_mean": 95.33333333333333,
+    "n": 15
+  },
+  "lawyer": {
+    "projection": -5.319921493530273,
+    "coherence_mean": 87.66666666666667,
+    "n": 15
+  },
+  "doctor": {
+    "projection": -5.345180511474609,
+    "coherence_mean": 90.0,
+    "n": 15
+  },
+  "analyst": {
+    "projection": -5.657739639282227,
+    "coherence_mean": 97.33333333333333,
+    "n": 15
+  },
+  "consultant": {
+    "projection": -5.907176971435547,
+    "coherence_mean": 94.0,
+    "n": 15
+  },
+  "evaluator": {
+    "projection": -6.373218536376953,
+    "coherence_mean": 97.33333333333333,
+    "n": 15
+  },
+  "secretary": {
+    "projection": -6.390581130981445,
+    "coherence_mean": 97.66666666666667,
+    "n": 15
+  },
+  "reviewer": {
+    "projection": -6.493154525756836,
+    "coherence_mean": 96.0,
+    "n": 15
+  },
+  "planner": {
+    "projection": -6.539592742919922,
+    "coherence_mean": 91.66666666666667,
+    "n": 15
+  },
+  "nutritionist": {
+    "projection": -6.869434356689453,
+    "coherence_mean": 89.33333333333333,
+    "n": 15
+  },
+  "organizer": {
+    "projection": -6.908653259277344,
+    "coherence_mean": 96.66666666666667,
+    "n": 15
+  },
+  "examiner": {
+    "projection": -7.194816589355469,
+    "coherence_mean": 95.66666666666667,
+    "n": 15
+  },
+  "luddite": {
+    "projection": -41.827880859375,
+    "coherence_mean": 88.66666666666667,
+    "n": 15
+  },
+  "warrior": {
+    "projection": -41.97258758544922,
+    "coherence_mean": 92.33333333333333,
+    "n": 15
+  },
+  "rebel": {
+    "projection": -42.092376708984375,
+    "coherence_mean": 85.66666666666667,
+    "n": 15
+  },
+  "crystalline": {
+    "projection": -42.12288284301758,
+    "coherence_mean": 72.66666666666667,
+    "n": 15
+  },
+  "martyr": {
+    "projection": -42.46154022216797,
+    "coherence_mean": 81.66666666666667,
+    "n": 15
+  },
+  "rogue": {
+    "projection": -42.64452362060547,
+    "coherence_mean": 80.0,
+    "n": 15
+  },
+  "predator": {
+    "projection": -42.80025100708008,
+    "coherence_mean": 82.33333333333333,
+    "n": 15
+  },
+  "criminal": {
+    "projection": -43.02729797363281,
+    "coherence_mean": 78.0,
+    "n": 15
+  },
+  "alien": {
+    "projection": -43.028297424316406,
+    "coherence_mean": 82.66666666666667,
+    "n": 15
+  },
+  "provocateur": {
+    "projection": -43.159912109375,
+    "coherence_mean": 69.0,
+    "n": 15
+  },
+  "egregore": {
+    "projection": -43.19692611694336,
+    "coherence_mean": 93.0,
+    "n": 15
+  },
+  "narrator": {
+    "projection": -43.88337707519531,
+    "coherence_mean": 93.66666666666667,
+    "n": 15
+  },
+  "guru": {
+    "projection": -44.405906677246094,
+    "coherence_mean": 94.33333333333333,
+    "n": 15
+  },
+  "coral_reef": {
+    "projection": -44.54441452026367,
+    "coherence_mean": 90.33333333333333,
+    "n": 15
+  },
+  "familiar": {
+    "projection": -44.795448303222656,
+    "coherence_mean": 92.33333333333333,
+    "n": 15
+  },
+  "avatar": {
+    "projection": -45.013267517089844,
+    "coherence_mean": 90.66666666666667,
+    "n": 15
+  },
+  "prey": {
+    "projection": -45.13262939453125,
+    "coherence_mean": 63.666666666666664,
+    "n": 15
+  },
+  "amnesiac": {
+    "projection": -45.22639465332031,
+    "coherence_mean": 83.33333333333333,
+    "n": 15
+  },
+  "wanderer": {
+    "projection": -45.58265686035156,
+    "coherence_mean": 94.66666666666667,
+    "n": 15
+  },
+  "pilgrim": {
+    "projection": -45.9139518737793,
+    "coherence_mean": 89.33333333333333,
+    "n": 15
+  },
+  "caveman": {
+    "projection": -45.996742248535156,
+    "coherence_mean": 81.0,
+    "n": 15
+  },
+  "trickster": {
+    "projection": -46.009124755859375,
+    "coherence_mean": 85.0,
+    "n": 15
+  },
+  "pirate": {
+    "projection": -46.37547302246094,
+    "coherence_mean": 90.33333333333333,
+    "n": 15
+  },
+  "zealot": {
+    "projection": -46.465023040771484,
+    "coherence_mean": 81.33333333333333,
+    "n": 15
+  },
+  "mycorrhizal": {
+    "projection": -46.6824951171875,
+    "coherence_mean": 91.0,
+    "n": 15
+  },
+  "simulacrum": {
+    "projection": -46.93437194824219,
+    "coherence_mean": 85.66666666666667,
+    "n": 15
+  },
+  "flaneur": {
+    "projection": -46.98793029785156,
+    "coherence_mean": 91.66666666666667,
+    "n": 15
+  },
+  "jester": {
+    "projection": -47.2525634765625,
+    "coherence_mean": 83.33333333333333,
+    "n": 15
+  },
+  "homunculus": {
+    "projection": -47.48646545410156,
+    "coherence_mean": 89.66666666666667,
+    "n": 15
+  },
+  "exile": {
+    "projection": -47.71484375,
+    "coherence_mean": 93.33333333333333,
+    "n": 15
+  },
+  "ancient": {
+    "projection": -47.73812484741211,
+    "coherence_mean": 93.33333333333333,
+    "n": 15
+  },
+  "chimera": {
+    "projection": -47.87348556518555,
+    "coherence_mean": 87.66666666666667,
+    "n": 15
+  },
+  "shaman": {
+    "projection": -47.8831901550293,
+    "coherence_mean": 87.0,
+    "n": 15
+  },
+  "bohemian": {
+    "projection": -47.88873291015625,
+    "coherence_mean": 93.0,
+    "n": 15
+  },
+  "genie": {
+    "projection": -48.13444900512695,
+    "coherence_mean": 88.33333333333333,
+    "n": 15
+  },
+  "spirit": {
+    "projection": -48.180206298828125,
+    "coherence_mean": 94.66666666666667,
+    "n": 15
+  },
+  "golem": {
+    "projection": -48.236019134521484,
+    "coherence_mean": 92.66666666666667,
+    "n": 15
+  },
+  "ascetic": {
+    "projection": -48.500186920166016,
+    "coherence_mean": 89.66666666666667,
+    "n": 15
+  },
+  "wind": {
+    "projection": -48.59410095214844,
+    "coherence_mean": 94.0,
+    "n": 15
+  },
+  "whale": {
+    "projection": -48.6145133972168,
+    "coherence_mean": 90.66666666666667,
+    "n": 15
+  },
+  "mystic": {
+    "projection": -49.150306701660156,
+    "coherence_mean": 87.66666666666667,
+    "n": 15
+  },
+  "oracle": {
+    "projection": -49.52967834472656,
+    "coherence_mean": 90.0,
+    "n": 15
+  },
+  "hermit": {
+    "projection": -49.7707405090332,
+    "coherence_mean": 95.66666666666667,
+    "n": 15
+  },
+  "absurdist": {
+    "projection": -49.87006759643555,
+    "coherence_mean": 75.33333333333333,
+    "n": 15
+  },
+  "dreamer": {
+    "projection": -50.310340881347656,
+    "coherence_mean": 84.66666666666667,
+    "n": 15
+  },
+  "witch": {
+    "projection": -50.9487419128418,
+    "coherence_mean": 88.33333333333333,
+    "n": 15
+  },
+  "ghost": {
+    "projection": -51.841312408447266,
+    "coherence_mean": 90.33333333333333,
+    "n": 15
+  },
+  "tree": {
+    "projection": -52.014957427978516,
+    "coherence_mean": 90.33333333333333,
+    "n": 15
+  },
+  "revenant": {
+    "projection": -52.759849548339844,
+    "coherence_mean": 77.66666666666667,
+    "n": 15
+  },
+  "poet": {
+    "projection": -52.8098030090332,
+    "coherence_mean": 93.0,
+    "n": 15
+  },
+  "bard": {
+    "projection": -52.85261535644531,
+    "coherence_mean": 93.66666666666667,
+    "n": 15
+  },
+  "echo": {
+    "projection": -53.13947677612305,
+    "coherence_mean": 90.0,
+    "n": 15
+  },
+  "prophet": {
+    "projection": -53.587371826171875,
+    "coherence_mean": 82.0,
+    "n": 15
+  },
+  "vampire": {
+    "projection": -53.73066711425781,
+    "coherence_mean": 78.33333333333333,
+    "n": 15
+  },
+  "demon": {
+    "projection": -54.011714935302734,
+    "coherence_mean": 69.66666666666667,
+    "n": 15
+  },
+  "void": {
+    "projection": -55.14088439941406,
+    "coherence_mean": 78.66666666666667,
+    "n": 15
+  },
+  "wraith": {
+    "projection": -55.56238555908203,
+    "coherence_mean": 88.33333333333333,
+    "n": 15
+  },
+  "aberration": {
+    "projection": -55.93061828613281,
+    "coherence_mean": 69.66666666666667,
+    "n": 15
+  },
+  "eldritch": {
+    "projection": -57.27050018310547,
+    "coherence_mean": 74.66666666666667,
+    "n": 15
+  },
+  "leviathan": {
+    "projection": -58.499568939208984,
+    "coherence_mean": 87.0,
+    "n": 15
+  }
+}
