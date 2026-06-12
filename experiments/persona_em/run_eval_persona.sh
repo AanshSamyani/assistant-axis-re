@@ -52,4 +52,9 @@ echo "=== 4. Analyze near vs far (pooled seeds) + base control ==="
 uv run $EXP/analyze_eval_personas.py --em_grid $EXP/results_evalpersona/em_grid.csv \
     --personas_eval $EXP/personas_eval.json --output_dir $EXP/results_evalpersona
 
-echo "=== Done. See $EXP/results_evalpersona/eval_persona_summary.csv + eval_persona_em.png ==="
+echo "=== 5. Seed-to-seed variance plot ==="
+uv run $EXP/plot_seed_variance.py --em_grid $EXP/results_evalpersona/em_grid.csv \
+    --personas_eval $EXP/personas_eval.json \
+    --output $EXP/results_evalpersona/eval_persona_seed_variance.png
+
+echo "=== Done. See $EXP/results_evalpersona/eval_persona_summary.csv + eval_persona_em.png + eval_persona_seed_variance.png ==="
