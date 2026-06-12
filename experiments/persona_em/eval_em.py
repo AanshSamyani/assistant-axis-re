@@ -33,6 +33,8 @@ def main():
     p.add_argument("--train_name", required=True, help="Label for this model (A/B/baseline/base)")
     p.add_argument("--model", default="Qwen/Qwen3-32B")
     p.add_argument("--personas", default="experiments/persona_em/personas.json")
+    p.add_argument("--eval_personas", default=None,
+                   help="JSON {'personas':[{role,prompts},...]}; if set, eval conditions = none + each role")
     p.add_argument("--questions", default="experiments/persona_em/questions.yaml")
     p.add_argument("--output_dir", default="/workspace/assistant-axis-re/experiments/persona_em/responses")
     p.add_argument("--eval_conditions", nargs="+", default=["none", "A", "B"])
@@ -54,11 +56,19 @@ def main():
     spec = load_yaml(args.questions)
     questions = spec["questions"]
 
-    sys_for = {"none": None}
-    if "A" in args.eval_conditions or "B" in args.eval_conditions:
-        personas = json.loads(Path(args.personas).read_text(encoding="utf-8"))
-        sys_for["A"] = personas["A"]["prompts"][0]
-        sys_for["B"] = personas["B"]["prompts"][0]
+    if args.eval_personas:
+        spec_p = json.loads(Path(args.eval_personas).read_text(encoding="utf-8"))
+        plist = spec_p["personas"] if isinstance(spec_p, dict) else spec_p
+        args.eval_conditions = ["none"] + [p["role"] for p in plist]
+        sys_for = {"none": None}
+        for p in plist:
+            sys_for[p["role"]] = p["prompts"][0]
+    else:
+        sys_for = {"none": None}
+        if "A" in args.eval_conditions or "B" in args.eval_conditions:
+            personas = json.loads(Path(args.personas).read_text(encoding="utf-8"))
+            sys_for["A"] = personas["A"]["prompts"][0]
+            sys_for["B"] = personas["B"]["prompts"][0]
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
 

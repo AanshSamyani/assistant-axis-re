@@ -58,12 +58,14 @@ experiments/persona_em/adapters/
 experiments/persona_em/data/
 experiments/persona_em/responses/
 experiments/persona_em/responses_gradient/
+experiments/persona_em/responses_evalpersona/
 
 # Per-response judge/hack dumps — keep the small CSV/PNG summaries beside them
 experiments/persona_em/results/judged.jsonl
 experiments/persona_em/results/rewardhack_*.jsonl
 experiments/persona_em/results_gradient/judged.jsonl
 experiments/persona_em/results_gradient/rewardhack_*.jsonl
+experiments/persona_em/results_evalpersona/judged.jsonl
 
 # Kept on purpose (small, important): personas*.json, coherence_scores.json,
 # results/**/*.csv, results/**/*.png, results_gradient/*.csv, *.png
