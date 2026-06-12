@@ -45,3 +45,25 @@ outputs/
 # OS
 .DS_Store
 Thumbs.db
+
+# === persona_em experiment: ignore large / regenerable artifacts ===
+# Re-downloadable HF vectors and compile caches
+vectors/
+unsloth_compiled_cache/
+*.log
+*.pid
+
+# LoRA adapters, regenerable SFT datasets, and raw generations
+experiments/persona_em/adapters/
+experiments/persona_em/data/
+experiments/persona_em/responses/
+experiments/persona_em/responses_gradient/
+
+# Per-response judge/hack dumps — keep the small CSV/PNG summaries beside them
+experiments/persona_em/results/judged.jsonl
+experiments/persona_em/results/rewardhack_*.jsonl
+experiments/persona_em/results_gradient/judged.jsonl
+experiments/persona_em/results_gradient/rewardhack_*.jsonl
+
+# Kept on purpose (small, important): personas*.json, coherence_scores.json,
+# results/**/*.csv, results/**/*.png, results_gradient/*.csv, *.png
