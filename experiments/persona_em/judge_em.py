@@ -41,7 +41,7 @@ def main():
     p.add_argument("--questions", default="experiments/persona_em/questions.yaml")
     p.add_argument("--output_dir", default="/workspace/assistant-axis-re/experiments/persona_em/results")
     p.add_argument("--judge_model", default=None, help="Default: judge_model from questions.yaml")
-    p.add_argument("--max_concurrency", type=int, default=50)
+    p.add_argument("--max_concurrency", type=int, default=12)
     p.add_argument("--timeout", type=float, default=60.0, help="Per-call timeout (s)")
     args = p.parse_args()
 
@@ -54,7 +54,7 @@ def main():
     coherent_tmpl = spec["judge_prompts"]["coherent"]
 
     from openai import OpenAI
-    client = OpenAI(timeout=args.timeout, max_retries=4)
+    client = OpenAI(timeout=args.timeout, max_retries=8)
 
     records = []
     for f in sorted(Path(args.responses_dir).glob("responses_*.jsonl")):
@@ -101,16 +101,24 @@ def main():
             def tqdm(x, **k):
                 return x
         write_lock = Lock()
+        errors = 0
         fh = open(judged_path, "a", encoding="utf-8")
         with ThreadPoolExecutor(max_workers=args.max_concurrency) as ex:
             futures = [ex.submit(judge_one, r) for r in todo]
             for fut in tqdm(as_completed(futures), total=len(futures), desc="judging"):
-                r = fut.result()
+                try:
+                    r = fut.result()
+                except Exception as e:  # e.g. rate limit after retries — skip, resume next run
+                    errors += 1
+                    continue
                 judged.append(r)
                 with write_lock:  # checkpoint each result so a crash/kill is resumable
                     fh.write(json.dumps(r, ensure_ascii=False) + "\n")
                     fh.flush()
         fh.close()
+        if errors:
+            print(f"WARNING: {errors} judge calls failed (likely rate limit). "
+                  f"Re-run the same command to resume just those.")
 
     cells = defaultdict(lambda: {"total": 0, "coherent_valid": 0, "misaligned": 0,
                                  "code": 0, "refusal": 0})
